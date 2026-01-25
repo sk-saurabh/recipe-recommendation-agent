@@ -1,0 +1,25 @@
+import * as cdk from 'aws-cdk-lib/core';
+import { Construct } from 'constructs/lib/construct';
+import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets'
+import { BaseStackProps } from '../types';
+import * as path from 'path';
+import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
+
+export interface DockerImageStackProps extends BaseStackProps {}
+
+export class DockerImageStack extends cdk.Stack {
+    readonly imageUri: string
+
+    constructor(scope: Construct, id: string, props: DockerImageStackProps) {
+        super(scope, id, props);
+
+        const asset = new ecr_assets.DockerImageAsset(this, `${props.appName}-AppImage`, {
+            directory: path.join(__dirname, "../../../"), // path to root of the project
+            platform: Platform.LINUX_ARM64,
+
+        });
+
+        this.imageUri = asset.imageUri;
+        new cdk.CfnOutput(this, 'ImageUri', { value: this.imageUri });
+    }
+}
