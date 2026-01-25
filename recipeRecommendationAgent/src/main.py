@@ -4,7 +4,7 @@ import os
 from strands import Agent
 from bedrock_agentcore import BedrockAgentCoreApp, RequestContext
 from bedrock_agentcore.memory import MemoryClient
-from mcp_client.client import get_streamable_http_mcp_client
+# from mcp_client.client import get_streamable_http_mcp_client
 from model.load import load_model
 from long_term_memory_hook import RecipeRecommendationMemoryHookProvider
 from bedrock_agentcore.memory.integrations.strands.config import AgentCoreMemoryConfig, RetrievalConfig
@@ -23,7 +23,7 @@ MEMORY_ID = "RecipeRecommendationAgent_mem-hCDVr5Foji"  # Your created memory ID
 memory_client = MemoryClient(region_name=REGION)
 
 # Import AgentCore Gateway as Streamable HTTP MCP Client
-mcp_client = get_streamable_http_mcp_client()
+# mcp_client = get_streamable_http_mcp_client()
 log.info("MCP Client created...")
 
 memory_hook = RecipeRecommendationMemoryHookProvider(MEMORY_ID, memory_client)
@@ -66,41 +66,41 @@ async def invoke(payload, context: RequestContext):
     
     user_input = payload.get("prompt", "")
     log.info("User Input: %s", user_input)
-    with mcp_client as client:
+    # with mcp_client as client:
         # Get MCP Tools
-        tools = client.list_tools_sync()
+    # tools = client.list_tools_sync()
 
-        # Create agent with memory tools
-        agent = Agent(
-            model=load_model(),
-            system_prompt="""
-                            You are a helpful recipe assistant with memory capabilities.
-                            Your aim is to provide personalized recipe recommendations based on:
+    # Create agent with memory tools
+    agent = Agent(
+        model=load_model(),
+        system_prompt="""
+                        You are a helpful recipe assistant with memory capabilities.
+                        Your aim is to provide personalized recipe recommendations based on:
 
-                            1. User's ingredients and preferences
-                            2. Past cooking history and feedback
-                            3. Dietary restrictions and allergies
-                            4. Cooking skill level and equipment
+                        1. User's ingredients and preferences
+                        2. Past cooking history and feedback
+                        3. Dietary restrictions and allergies
+                        4. Cooking skill level and equipment
 
-                            Use memory tools to:
-                            - Remember user preferences across conversations
-                            - Store successful recipes and user feedback
-                            - Track dietary restrictions and allergies
-                            - Learn from user's cooking patterns
+                        Use memory tools to:
+                        - Remember user preferences across conversations
+                        - Store successful recipes and user feedback
+                        - Track dietary restrictions and allergies
+                        - Learn from user's cooking patterns
 
-                            Always limit your recommendations to 1 recipe and use tools when appropriate.
-                            When you learn something new about the user, save it to memory for future reference.
-                        """,
-            hooks=[memory_hook],
-            tools=tools,
-            state={"actor_id": actor_id, "session_id": session_id},
-            session_manager=session_manager
+                        Always limit your recommendations to 1 recipe and use tools when appropriate.
+                        When you learn something new about the user, save it to memory for future reference.
+                    """,
+        hooks=[memory_hook],
+        tools=[],
+        state={"actor_id": actor_id, "session_id": session_id},
+        session_manager=session_manager
 
-        )
+    )
 
-        response = agent(user_input)
-        log.info("Agent Response: %s", response.message["content"][0])
-        return response.message["content"][0]["text"]
+    response = agent(user_input)
+    log.info("Agent Response: %s", response.message["content"][0])
+    return response.message["content"][0]["text"]
 
 def format_response(result) -> str:
     """Extract code from metrics and format with LLM response."""

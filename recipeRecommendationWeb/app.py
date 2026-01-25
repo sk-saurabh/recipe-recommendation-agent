@@ -15,9 +15,10 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here')
 
 # Configuration
-AGENT_ARN = "arn:aws:bedrock-agentcore:us-west-2:472284507901:runtime/recipeBot_Agent-EroI2I9lpN"
-REGION_NAME = "us-west-2"
-COGNITO_CLIENT_ID = os.environ.get('COGNITO_CLIENT_ID', '5j26urvknbp1bqr8avutfs46qv')
+AGENT_ARN = os.environ.get('AGENTCORE_RUNTIME_ARN','')
+REGION_NAME = os.environ.get('REGION_NAME', '')
+print(f"Running Agent in Region: {REGION_NAME}", flush=True)
+COGNITO_CLIENT_ID = os.environ.get('COGNITO_CLIENT_ID', '')
 
 # Initialize AWS clients
 agent_core_client = boto3.client('bedrock-agentcore')
